@@ -6,8 +6,10 @@ from collections import defaultdict
 from model import *
 from torch.optim.lr_scheduler import ExponentialLR
 import argparse
+from torch.utils.tensorboard import SummaryWriter
 
-    
+writer = SummaryWriter()
+
 class Experiment:
 
     def __init__(self, learning_rate=0.0005, ent_vec_dim=200, rel_vec_dim=200, 
@@ -134,6 +136,7 @@ class Experiment:
                 if self.label_smoothing:
                     targets = ((1.0-self.label_smoothing)*targets) + (1.0/targets.size(1))           
                 loss = model.loss(predictions, targets)
+                writer.add_scalar('Loss/train', loss, it)
                 loss.backward()
                 opt.step()
                 losses.append(loss.item())
@@ -151,6 +154,7 @@ class Experiment:
                     start_test = time.time()
                     self.evaluate(model, d.test_data)
                     print(time.time()-start_test)
+writer.flush()
            
 
         

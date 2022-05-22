@@ -155,6 +155,7 @@ class Experiment:
                     self.evaluate(model, d.test_data)
                     print(time.time()-start_test)
 writer.flush()
+writer.close()
            
 
         

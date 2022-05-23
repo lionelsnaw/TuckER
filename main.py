@@ -12,7 +12,7 @@ writer = SummaryWriter()
 
 class Experiment:
 
-    def __init__(self, learning_rate=0.0005, ent_vec_dim=10, rel_vec_dim=10, 
+    def __init__(self, learning_rate=0.0005, ent_vec_dim=20, rel_vec_dim=20, 
                  num_iterations=500, batch_size=128, decay_rate=0., cuda=False, 
                  input_dropout=0.3, hidden_dropout1=0.4, hidden_dropout2=0.5,
                  label_smoothing=0.):

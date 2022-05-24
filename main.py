@@ -49,7 +49,7 @@ class Experiment:
         return np.array(batch), targets
 
     
-    def evaluate(self, model, data):
+    def evaluate(self, model, data, return_value=False):
         hits = []
         ranks = []
         for i in range(10):
@@ -96,10 +96,10 @@ class Experiment:
         print('Mean rank: {0}'.format(np.mean(ranks)))
         print('Mean reciprocal rank: {0}'.format(np.mean(1./np.array(ranks))))
 
+        if return_value:
+            return np.mean(hits[9])
 
-
-
-    def train_and_eval(self):
+    def train_and_eval(self, d, return_value=False):
         print("Training the TuckER model...")
         self.entity_idxs = {d.entities[i]:i for i in range(len(d.entities))}
         self.relation_idxs = {d.relations[i]:i for i in range(len(d.relations))}
@@ -154,6 +154,10 @@ class Experiment:
                     start_test = time.time()
                     self.evaluate(model, d.test_data)
                     print(time.time()-start_test)
+
+        if return_value: 
+            return self.evaluate(model, d.valid_data, return_value)
+            
 writer.flush()
 writer.close()
            
@@ -201,6 +205,6 @@ if __name__ == '__main__':
                             decay_rate=args.dr, ent_vec_dim=args.edim, rel_vec_dim=args.rdim, cuda=args.cuda,
                             input_dropout=args.input_dropout, hidden_dropout1=args.hidden_dropout1, 
                             hidden_dropout2=args.hidden_dropout2, label_smoothing=args.label_smoothing)
-    experiment.train_and_eval()
+    experiment.train_and_eval(d)
                 
 

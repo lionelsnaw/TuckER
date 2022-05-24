@@ -40,7 +40,7 @@ class Experiment:
 
     def get_batch(self, er_vocab, er_vocab_pairs, idx):
         batch = er_vocab_pairs[idx:idx+self.batch_size]
-        targets = np.zeros((len(batch), len(d.entities)))
+        targets = np.zeros((len(batch), len(self.d.entities)))
         for idx, pair in enumerate(batch):
             targets[idx, er_vocab[pair]] = 1.
         targets = torch.FloatTensor(targets)
@@ -56,7 +56,7 @@ class Experiment:
             hits.append([])
 
         test_data_idxs = self.get_data_idxs(data)
-        er_vocab = self.get_er_vocab(self.get_data_idxs(d.data))
+        er_vocab = self.get_er_vocab(self.get_data_idxs(self.d.data))
 
         print("Number of data points: %d" % len(test_data_idxs))
         
@@ -100,11 +100,12 @@ class Experiment:
             return np.mean(hits[9])
 
     def train_and_eval(self, d, return_value=False):
+        self.d = d
         print("Training the TuckER model...")
-        self.entity_idxs = {d.entities[i]:i for i in range(len(d.entities))}
-        self.relation_idxs = {d.relations[i]:i for i in range(len(d.relations))}
+        self.entity_idxs = {self.d.entities[i]:i for i in range(len(self.d.entities))}
+        self.relation_idxs = {self.d.relations[i]:i for i in range(len(self.d.relations))}
 
-        train_data_idxs = self.get_data_idxs(d.train_data)
+        train_data_idxs = self.get_data_idxs(self.d.train_data)
         print("Number of training data points: %d" % len(train_data_idxs))
 
         model = TuckER(d, self.ent_vec_dim, self.rel_vec_dim, **self.kwargs)
@@ -148,15 +149,15 @@ class Experiment:
             model.eval()
             with torch.no_grad():
                 print("Validation:")
-                self.evaluate(model, d.valid_data)
+                self.evaluate(model, self.d.valid_data)
                 if not it%2:
                     print("Test:")
                     start_test = time.time()
-                    self.evaluate(model, d.test_data)
+                    self.evaluate(model, self.d.test_data)
                     print(time.time()-start_test)
 
         if return_value: 
-            return self.evaluate(model, d.valid_data, return_value)
+            return self.evaluate(model, self.d.valid_data, return_value)
             
 writer.flush()
 writer.close()
